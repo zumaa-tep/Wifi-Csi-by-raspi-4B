@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to CSI Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background: linear-gradient(135deg, #ffffff 0%, #f9d4ee 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+    .welcome-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+      animation: fadeInUp 1s ease-out both;
+    }
+    .welcome-box .logo {
+      max-width: 100px;
+      margin-bottom: 25px;
+      animation: popIn 0.8s ease-out both;
+    }
+    .welcome-box h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .welcome-box p {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+    .btn-csi {
+      background: #1cc88a;
+      border: none;
+      color: #fff;
+      font-size: 1.1rem;
+      padding: 12px 36px;
+      border-radius: 50px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-csi:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="welcome-box">
+    <img src="logo.PNG" alt="CSI Logo" class="logo">
+    <h1>CSI-WiFi </h1>
+    <p class="mb-4">Monitor and visualize CSI data in real-time </p>
+    <a href="/csi.html" class="btn btn-csi">Get Started</a>
+  </div>
+
+  <!-- Bootstrap JS (optional) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

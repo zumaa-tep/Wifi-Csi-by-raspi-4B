@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSI Activity Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+  <style>
+    :root {
+      --walking: #28a745;
+      --sitting: #17a2b8;
+      --standing: #ffc107;
+      --falling: #dc3545;
+      --lying: #6f42c1;
+      --empty: #adb5bd;
+      --bg: #f8f9fa;
+      --card-bg: #fff;
+      --sidebar-bg: #2c3e50;
+      --sidebar-active: #34495e;
+      --text-dark: #212529;
+      --text-light: #f8f9fa;
+    }
+    
+    body {
+      background-color: var(--bg);
+      padding-top: 56px;
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      color: var(--text-dark);
+    }
+    
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      z-index: 1045;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-toggle:hover {
+      transform: scale(1.1);
+    }
+    
+    /* Sidebar styles */
+    .offcanvas {
+      background-color: var(--sidebar-bg);
+      color: var(--text-light);
+    }
+    .offcanvas-header {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .offcanvas-title {
+      font-weight: 600;
+    }
+    .list-group-item {
+      background-color: transparent;
+      color: var(--text-light);
+      border-color: rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+    .list-group-item:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+    .list-group-item.active {
+      background-color: var(--sidebar-active);
+      border-color: var(--sidebar-active);
+    }
+    .list-group-item i {
+      width: 24px;
+      text-align: center;
+    }
+    
+    /* Status box with animation */
+    .status-box {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      text-align: center;
+      transition: all 0.5s ease;
+      border-left: 5px solid var(--sitting);
+    }
+    .status-box.walking { border-left-color: var(--walking); }
+    .status-box.sitting { border-left-color: var(--sitting); }
+    .status-box.standing { border-left-color: var(--standing); }
+    .status-box.falling { border-left-color: var(--falling); }
+    .status-box.empty { border-left-color: var(--empty); }
+    
+    .status-box i {
+      font-size: 80px;
+      margin-bottom: 15px;
+      transition: all 0.5s ease;
+    }
+    .status-box h4 {
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+    }
+    .status-box p {
+      font-size: 1.1rem;
+    }
+    
+    /* Activity indicators */
+    .activity-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background-color: var(--empty);
+    }
+    .activity-indicator.walking { background-color: var(--walking); }
+    .activity-indicator.sitting { background-color: var(--sitting); }
+    .activity-indicator.standing { background-color: var(--standing); }
+    .activity-indicator.falling { background-color: var(--falling); }
+    .activity-indicator.empty { background-color: var(--empty); }
+    
+    /* Legend with cards */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background: var(--card-bg);
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .legend-item:hover {
+      transform: translateY(-3px);
+    }
+    .legend-item i {
+      font-size: 1.6rem;
+    }
+    
+    /* History table with hover effects */
+    .history-table {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .history-table th {
+      background-color: #f1f3f5;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      color: #6c757d;
+    }
+    .history-table th,
+    .history-table td {
+      vertical-align: middle;
+      text-align: center;
+      padding: 15px;
+    }
+    .history-table tr {
+      transition: background-color 0.2s ease;
+    }
+    .history-table tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    /* Status colors */
+    .status-walking { color: var(--walking); }
+    .status-sitting { color: var(--sitting); }
+    .status-standing { color: var(--standing); }
+    .status-falling { color: var(--falling); }
+    .status-empty { color: var(--empty); }
+    
+    /* Pulse animation for new entries */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .pulse {
+      animation: pulse 0.5s ease;
+    }
+    
+    /* Connection status */
+    .connection-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .status-box i {
+        font-size: 60px;
+      }
+      .status-box h4 {
+        font-size: 1.3rem;
+      }
+      .legend {
+        gap: 10px;
+      }
+      .legend-item {
+        padding: 8px 12px;
+      }
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar toggle -->
+  <i class="bi bi-list sidebar-toggle" data-bs-toggle="offcanvas" data-bs-target="#sidebar"></i>
+
+  <!-- Offcanvas Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Activity Dashboard</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="list-group list-group-flush">
+        <a href="/csi.html" class="list-group-item list-group-item-action active">
+          <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        </a>
+        <a href="/profile.html" class="list-group-item list-group-item-action">
+          <i class="bi bi-person-circle me-2"></i>User Profile
+        </a>
+        <a href="/history.html" class="list-group-item list-group-item-action">
+          <i class="bi bi-clock-history me-2"></i>Activity History
+        </a>
+        <a href="/setting.html" class="list-group-item list-group-item-action">
+          <i class="bi bi-gear-fill me-2"></i>Settings
+        </a>
+        <a href="/help.html" class="list-group-item list-group-item-action">
+          <i class="bi bi-question-circle me-2"></i>Help & Support
+        </a>
+      </div>
+      <div class="px-3 py-2 mt-auto">
+        <div class="d-flex align-items-center connection-status">
+          <div class="flex-shrink-0">
+            <i class="bi bi-circle-fill text-secondary"></i>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <small class="text-muted">Connection Status</small>
+            <div class="fw-bold">Connecting...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main container -->
+  <div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">Activity Monitoring</h2>
+      <div class="d-flex align-items-center">
+        <span class="me-2">Live</span>
+        <div class="spinner-grow text-success" style="width: 10px; height: 10px;" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Activity -->
+    <div class="status-box sitting">
+      <i id="current-icon" class="bi bi-person-seat icon-sitting"></i>
+      <h4 id="current-activity">Sitting</h4>
+      <p id="current-time" class="text-muted">Last update: --:--:--</p>
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <div class="d-flex align-items-center">
+          <span class="activity-indicator sitting me-2"></span>
+          <span>Duration: <span id="activity-duration">0h 0m 0s</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Icon Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <i class="bi bi-person-walking text-success"></i>
+        <span>Walking</span>
+      </div>
+      <div class="legend-item">
+        <i class="bi bi-person-seat text-info"></i>
+        <span>Sitting</span>
+      </div>
+      <div class="legend-item">
+        <i class="bi bi-person-standing text-warning"></i>
+        <span>Standing</span>
+      </div>
+      <div class="legend-item">
+        <i class="bi bi-person-fall text-danger"></i>
+        <span>Falling</span>
+      </div>
+      <div class="legend-item">
+        <i class="bi bi-person-x text-secondary"></i>
+        <span>Empty</span>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <h5 class="mb-3">Recent Activities</h5>
+    <div class="history-table table-responsive">
+      <table class="table mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 20%">Status</th>
+            <th style="width: 30%">Time</th>
+            
+          </tr>
+        </thead>
+        <tbody id="history-table-body">
+          <tr>
+            <td colspan="3" class="text-center py-4">Waiting for activity data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activity Statistics -->
+    <div class="row mt-4">
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Activity Distribution</h5>
+            <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Daily Summary</h5>
+            <ul class="list-group list-group-flush" id="daily-summary">
+              <li class="list-group-item d-flex justify-content-between align-items-center" style="color: black;">
+                <span><i class="bi bi-person-walking text-success me-2"></i>Walking</span>
+                <span class="badge bg-success rounded-pill">0h 0m 0s</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center" style="color: black;">
+                <span><i class="bi bi-person-seat text-info me-2"></i>Sitting</span>
+                <span class="badge bg-info rounded-pill">0h 0m 0s</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center" style="color: black;">
+                <span><i class="bi bi-person-standing text-warning me-2"></i>Standing</span>
+                <span class="badge bg-warning rounded-pill">0h 0m 0s</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center" style="color: black;">
+                <span><i class="bi bi-person-fall text-danger me-2"></i>Falling</span>
+                <span class="badge bg-danger rounded-pill">0</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Connection status badge -->
+  <div id="connection-badge" class="connection-badge bg-secondary text-white">
+    <i class="bi bi-circle-fill me-1"></i>
+    <span>Connecting to MQTT...</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM elements
+      const statusBox = document.querySelector('.status-box');
+      const iconEl = document.getElementById('current-icon');
+      const actEl = document.getElementById('current-activity');
+      const timeEl = document.getElementById('current-time');
+      const durationEl = document.getElementById('activity-duration');
+      const historyBody = document.getElementById('history-table-body');
+      const connectionBadge = document.getElementById('connection-badge');
+      const connectionStatus = document.querySelector('.connection-status');
+      const dailySummary = document.getElementById('daily-summary');
+      
+      // Connection variables
+      let mqttClient = null;
+      let isConnected = false;
+      let reconnectAttempts = 0;
+      const MAX_RECONNECT_ATTEMPTS = 5;
+      
+      // Activity tracking
+      let currentActivity = 'sitting';
+      let activityStartTime = null;
+      let lastUpdateTime = null;
+      let activityDurationInterval = null;
+      let activityChart = null;
+      
+      // Activity statistics
+      const activityStats = {
+        walking: { count: 0, duration: 0 },
+        sitting: { count: 0, duration: 0 },
+        standing: { count: 0, duration: 0 },
+        falling: { count: 0, duration: 0 },
+        empty: { count: 0, duration: 0 }
+      };
+      
+      const iconMap = {
+        walking: { icon: 'bi-person-walking', class: 'text-success', color: 'walking' },
+        sitting: { icon: 'bi-person-seat', class: 'text-info', color: 'sitting' },
+        standing: { icon: 'bi-person-standing', class: 'text-warning', color: 'standing' },
+        falling: { icon: 'bi-person-fall', class: 'text-danger', color: 'falling' },
+        empty: { icon: 'bi-person-x', class: 'text-secondary', color: 'empty' }
+      };
+
+      // Format time duration
+      function formatDuration(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hours}h ${mins}m ${secs}s`;
+      }
+      
+      // Update duration counter
+      function updateDuration() {
+        if (activityStartTime) {
+          const now = new Date();
+          const duration = Math.floor((now - activityStartTime) / 1000);
+          durationEl.textContent = formatDuration(duration);
+        }
+      }
+      
+      // Update current activity display
+      function updateCurrentActivity(activity, timestamp) {
+        const activityData = iconMap[activity] || iconMap.sitting;
+        
+        // Only reset timer if activity changed
+        if (activity !== currentActivity) {
+          // Update stats for previous activity
+          if (activityStartTime && currentActivity) {
+            const duration = Math.floor((timestamp - activityStartTime) / 1000);
+            activityStats[currentActivity].duration += duration;
+            activityStats[currentActivity].count++;
+            updateDailySummary();
+            updateActivityChart();
+          }
+          
+          currentActivity = activity;
+          activityStartTime = timestamp;
+          
+          // Clear previous interval
+          if (activityDurationInterval) {
+            clearInterval(activityDurationInterval);
+          }
+          
+          // Start new interval
+          updateDuration();
+          activityDurationInterval = setInterval(updateDuration, 1000);
+          
+          // Add animation classes
+          iconEl.classList.add('animate__animated', 'animate__pulse');
+          statusBox.classList.add('animate__animated', 'animate__pulse');
+          
+          // Remove animation classes after animation completes
+          setTimeout(() => {
+            iconEl.classList.remove('animate__animated', 'animate__pulse');
+            statusBox.classList.remove('animate__animated', 'animate__pulse');
+          }, 1000);
+        }
+        
+        // Update DOM elements
+        iconEl.className = `bi ${activityData.icon} ${activityData.class}`;
+        actEl.textContent = activity.charAt(0).toUpperCase() + activity.slice(1);
+        timeEl.textContent = `Last update: ${timestamp.toLocaleTimeString()}`;
+        
+        // Update status box color
+        statusBox.className = 'status-box ' + activityData.color;
+      }
+      
+      // Add history row
+      function addHistoryRow(activity, timestamp, duration, confidence) {
+        // Remove the "waiting for data" row if it exists
+        if (historyBody.rows.length === 1 && historyBody.rows[0].cells[0].colSpan === 2) {
+          historyBody.deleteRow(0);
+        }
+        
+        const activityData = iconMap[activity] || iconMap.sitting;
+        const row = historyBody.insertRow(0);
+        row.classList.add('pulse');
+        
+        // Status cell with icon
+        const statusCell = row.insertCell();
+        const icon = document.createElement('i');
+        icon.className = `bi ${activityData.icon} ${activityData.class}`;
+        statusCell.appendChild(icon);
+        statusCell.innerHTML += `<span class="d-block small text-muted">${activity}</span>`;
+        
+        // Time cell
+        const timeCell = row.insertCell();
+        timeCell.textContent = timestamp.toLocaleTimeString();
+        timeCell.innerHTML += `<span class="d-block small text-muted">${timestamp.toLocaleDateString()}</span>`;
+        
+        
+        
+        // Keep only the last 10 entries
+        if (historyBody.rows.length > 10) {
+          historyBody.deleteRow(10);
+        }
+      }
+      
+      // Update daily summary
+      function updateDailySummary() {
+        const items = dailySummary.querySelectorAll('li');
+        
+        items[0].querySelector('.badge').textContent = 
+          `${Math.floor(activityStats.walking.duration / 3600)}h ${Math.floor((activityStats.walking.duration % 3600) / 60)}m ${activityStats.walking.duration % 60}s`;
+        items[1].querySelector('.badge').textContent = 
+          `${Math.floor(activityStats.sitting.duration / 3600)}h ${Math.floor((activityStats.sitting.duration % 3600) / 60)}m ${activityStats.sitting.duration % 60}s`;
+        items[2].querySelector('.badge').textContent = 
+          `${Math.floor(activityStats.standing.duration / 3600)}h ${Math.floor((activityStats.standing.duration % 3600) / 60)}m ${activityStats.standing.duration % 60}s`;
+        items[3].querySelector('.badge').textContent = activityStats.falling.count;
+      }
+      
+      // Initialize activity chart
+      function initActivityChart() {
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        
+        activityChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Walking', 'Sitting', 'Standing', 'Falling', 'Empty'],
+            datasets: [{
+              data: [0, 0, 0, 0, 0],
+              backgroundColor: [
+                '#28a745',
+                '#17a2b8',
+                '#ffc107',
+                '#dc3545',
+                '#adb5bd'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+              }
+            }
+          }
+        });
+      }
+      
+      // Update activity chart
+      function updateActivityChart() {
+        if (!activityChart) return;
+        
+        activityChart.data.datasets[0].data = [
+          activityStats.walking.duration,
+          activityStats.sitting.duration,
+          activityStats.standing.duration,
+          activityStats.falling.duration,
+          activityStats.empty.duration
+        ];
+        
+        activityChart.update();
+      }
+      
+      // Update connection status
+      function updateConnectionStatus(connected, message = '') {
+        const statusIcon = connectionBadge.querySelector('i');
+        const statusText = connectionBadge.querySelector('span');
+        const liveIndicator = document.querySelector('.spinner-grow');
+        
+        if (connected) {
+          statusIcon.className = 'bi bi-circle-fill me-1 text-success';
+          statusText.textContent = message || 'Connected to MQTT';
+          connectionBadge.className = 'connection-badge bg-success text-white';
+          liveIndicator.classList.remove('d-none');
+          
+          // Update sidebar status
+          connectionStatus.querySelector('i').className = 'bi bi-circle-fill text-success';
+          connectionStatus.querySelector('.fw-bold').textContent = 'Connected';
+        } else {
+          statusIcon.className = 'bi bi-circle-fill me-1 text-danger';
+          statusText.textContent = message || 'Disconnected from MQTT';
+          connectionBadge.className = 'connection-badge bg-danger text-white';
+          liveIndicator.classList.add('d-none');
+          
+          // Update sidebar status
+          connectionStatus.querySelector('i').className = 'bi bi-circle-fill text-danger';
+          connectionStatus.querySelector('.fw-bold').textContent = 'Disconnected';
+        }
+      }
+      
+      // Handle incoming MQTT data
+      function handleData(msg) {
+        let data;
+        try { 
+          data = JSON.parse(msg.toString()); 
+          console.log('Received data:', data);
+        } catch (e) { 
+          console.error('Error parsing message:', e);
+          return; 
+        }
+        
+        const activity = data.behavior?.toLowerCase() || 'sitting';
+        const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
+        const confidence = data.confidence || Math.random(); // Default to random if not provided
+        
+        // Calculate duration (simplified - in a real app you'd track this properly)
+        const duration = lastUpdateTime ? Math.floor((timestamp - lastUpdateTime) / 1000) : 0;
+        lastUpdateTime = timestamp;
+        
+        // Update the UI
+        updateCurrentActivity(activity, timestamp);
+        addHistoryRow(activity, timestamp, duration, confidence);
+      }
+      
+      // Initialize MQTT connection
+      function initMQTT() {
+        const options = {
+          clientId: 'csi-dashboard-' + Math.random().toString(16).substr(2, 8),
+          clean: true,
+          reconnectPeriod: 5000, // 5 seconds
+          connectTimeout: 30000, // 30 seconds
+          keepalive: 60
+        };
+        
+        // Try multiple brokers in sequence
+        const brokers = [
+          'wss://broker.emqx.io:8084/mqtt',
+          'wss://test.mosquitto.org:8081',
+          'ws://broker.hivemq.com:8000/mqtt'
+        ];
+        
+        let currentBrokerIndex = 0;
+        
+        function connectToBroker() {
+          if (currentBrokerIndex >= brokers.length) {
+            console.error('All brokers failed, loading demo data');
+            updateConnectionStatus(false, 'All brokers failed, using demo data');
+            loadDemoData();
+            return;
+          }
+          
+          const brokerUrl = brokers[currentBrokerIndex];
+          updateConnectionStatus(false, `Connecting to ${new URL(brokerUrl).hostname}...`);
+          
+          try {
+            mqttClient = mqtt.connect(brokerUrl, options);
+            
+            mqttClient.on('connect', () => {
+              console.log(`Connected to ${brokerUrl}`);
+              isConnected = true;
+              reconnectAttempts = 0;
+              updateConnectionStatus(true, `Connected to ${new URL(brokerUrl).hostname}`);
+              subscribeToTopics();
+            });
+            
+            mqttClient.on('message', (topic, message) => {
+              console.log(`Received message on ${topic}`);
+              handleData(message);
+            });
+            
+            mqttClient.on('error', (error) => {
+              console.error('MQTT Error:', error);
+              updateConnectionStatus(false, `Connection error: ${error.message}`);
+            });
+            
+            mqttClient.on('reconnect', () => {
+              console.log('Attempting to reconnect...');
+              reconnectAttempts++;
+              if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+                console.warn('Max reconnection attempts reached, trying next broker');
+                currentBrokerIndex++;
+                mqttClient.end();
+                connectToBroker();
+              }
+            });
+            
+            mqttClient.on('close', () => {
+              console.log('Connection closed');
+              isConnected = false;
+              updateConnectionStatus(false, 'Connection closed');
+            });
+            
+            mqttClient.on('offline', () => {
+              console.log('Client offline');
+              isConnected = false;
+              updateConnectionStatus(false, 'Connection offline');
+            });
+            
+          } catch (error) {
+            console.error('MQTT Initialization Error:', error);
+            currentBrokerIndex++;
+            connectToBroker();
+          }
+        }
+        
+        connectToBroker();
+      }
+      
+      // Subscribe to topics
+      function subscribeToTopics() {
+        if (!mqttClient || !isConnected) return;
+        
+        const topics = ['mn/csi'];
+        topics.forEach(topic => {
+          mqttClient.subscribe(topic, { qos: 1 }, (err, granted) => {
+            if (err) {
+              console.error(`Failed to subscribe to ${topic}:`, err);
+              updateConnectionStatus(false, `Subscribe failed: ${topic}`);
+            } else {
+              console.log(`Successfully subscribed to ${topic}`, granted);
+            }
+          });
+        });
+      }
+      
+      // Load demo data if no connection
+      function loadDemoData() {
+        console.log('Loading demo data');
+        const now = new Date();
+        const demoMessages = [
+          { behavior: 'Walking', timestamp: new Date(now - 9000), confidence: 0.92 },
+          { behavior: 'Standing', timestamp: new Date(now - 15000), confidence: 0.87 },
+          { behavior: 'Sitting', timestamp: new Date(now - 25000), confidence: 0.95 },
+          { behavior: 'Falling', timestamp: new Date(now - 35000), confidence: 0.78 },
+          { behavior: 'Empty', timestamp: new Date(now - 45000), confidence: 0.99 }
+        ];
+        
+        demoMessages.forEach((msg, index) => {
+          setTimeout(() => {
+            handleData(JSON.stringify(msg));
+          }, index * 1500);
+        });
+        
+       // Simulate periodic updates by publishing to MQTT broker
+      setInterval(() => {
+        const activities = ['walking', 'sitting', 'standing', 'falling', 'empty'];
+        const payload = {
+          behavior: activities[Math.floor(Math.random() * activities.length)],
+          timestamp: new Date().toISOString(),
+          
+        };
+        const msg = JSON.stringify(payload);
+        // Publish simulated payload to MQTT topic
+        mqttClient.publish('mn/csi', msg, { qos: 1 }, err => {
+          if (err) console.error('Publish error:', err);
+          else console.log('Published simulated payload:', msg);
+        });
+      }, 8000);
+      }
+      
+      // Initialize the dashboard
+      initMQTT();
+      initActivityChart();
+      
+      // Fallback: If no messages received after 15 seconds, show demo data
+      setTimeout(() => {
+        if (historyBody.rows.length === 1 && historyBody.rows[0].cells[0].colSpan === 3) {
+          loadDemoData();
+        }
+      }, 15000);
+    });
+
+   
+      initMQTT();
+      initActivityChart();
+
+      setTimeout(() => {
+        if (historyBody.rows.length === 1 && historyBody.rows[0].cells[0].colSpan === 3) {
+          loadDemoData();
+        }
+      }, 15000);
+
+    ;
+  </script>
+</body>
+</html>

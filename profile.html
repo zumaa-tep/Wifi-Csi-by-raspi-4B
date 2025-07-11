@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile Information</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f0f2f5;
+      padding-top: 56px;
+    }
+    .sidebar-toggle {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 1045;
+      color: #333;
+    }
+    .profile-container {
+      max-width: 720px;
+      margin: 1rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.08);
+    }
+    .offcanvas-body .list-group-item.active {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+      color: #fff;
+    }
+    .form-floating input {
+      height: calc(3.5rem + 2px);
+    }
+    .btn-primary,
+    .btn-warning {
+      min-width: 120px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle -->
+  <i class="bi bi-list sidebar-toggle" data-bs-toggle="offcanvas" data-bs-target="#sidebar"></i>
+
+  <!-- Offcanvas Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Menu</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="list-group list-group-flush">
+        <a href="/csi.html" class="list-group-item list-group-item-action active">
+          <i class="bi bi-house-door-fill me-2"></i>Home
+        </a>
+        <a href="/profile.html" class="list-group-item list-group-item-action">
+          <i class="bi bi-person-circle me-2"></i>Profile
+        </a>
+        <a href="/setting.html" class="list-group-item list-group-item-action">
+          <i class="bi bi-gear-fill me-2"></i>Settings
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container profile-container">
+    <h3 class="mb-4 text-center">Profile</h3>
+
+    <!-- View Section -->
+    <div id="view-section" class="d-none">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">User Details</h5>
+          <p><strong>First Name:</strong> <span id="v-yourFirstName"></span></p>
+          <p><strong>Last Name:</strong> <span id="v-yourLastName"></span></p>
+          <p><strong>Phone Number:</strong> <span id="v-Phone Number"></span></p>
+          <p><strong>Email:</strong> <span id="v-E-Mail"></span></p>
+          <p><strong>Date of Birth:</strong> <span id="v-yourDob"></span> (<span id="v-yourAge"></span> yrs)</p>
+        </div>
+      </div>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Elder Details</h5>
+          <p><strong>First Name:</strong> <span id="v-elderFirstName"></span></p>
+          <p><strong>Last Name:</strong> <span id="v-elderLastName"></span></p>
+          <p><strong>Date of Birth:</strong> <span id="v-elderDob"></span> (<span id="v-elderAge"></span> yrs)</p>
+          <p><strong>Conditions:</strong> <span id="v-elderDisease"></span></p>
+        </div>
+      </div>
+      <div class="text-end">
+        <button class="btn btn-warning" onclick="showEdit()">Edit Profile</button>
+      </div>
+    </div>
+
+    <!-- Edit Section -->
+    <form id="edit-section">
+      <div class="row g-3 mb-4">
+        <div class="col-md-6 form-floating">
+          <input type="text" name="yourFirstName" id="yourFirstName" class="form-control" placeholder="First Name">
+          <label for="yourFirstName">First Name</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="text" name="yourLastName" id="yourLastName" class="form-control" placeholder="Last Name">
+          <label for="yourLastName">Last Name</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="text" name="Phone Number" id="phoneNumber" class="form-control" placeholder="Phone Number">
+          <label for="phoneNumber">Phone Number</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="email" name="E-Mail" id="emailAddress" class="form-control" placeholder="Email">
+          <label for="emailAddress">Email</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="text" name="yourDob" id="yourDob" class="form-control" placeholder="Date of Birth">
+          <label for="yourDob">Date of Birth</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="number" name="yourAge" id="yourAge" class="form-control" placeholder="Age" readonly>
+          <label for="yourAge">Age</label>
+        </div>
+      </div>
+      <h5 class="mb-3">Elder Details</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6 form-floating">
+          <input type="text" name="elderFirstName" id="elderFirstName" class="form-control" placeholder="First Name">
+          <label for="elderFirstName">First Name</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="text" name="elderLastName" id="elderLastName" class="form-control" placeholder="Last Name">
+          <label for="elderLastName">Last Name</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="text" name="elderDob" id="elderDob" class="form-control" placeholder="Date of Birth">
+          <label for="elderDob">Date of Birth</label>
+        </div>
+        <div class="col-md-6 form-floating">
+          <input type="number" name="elderAge" id="elderAge" class="form-control" placeholder="Age" readonly>
+          <label for="elderAge">Age</label>
+        </div>
+      </div>
+      <div class="form-floating mb-4">
+        <input type="text" name="elderDisease" id="elderDisease" class="form-control" placeholder="Conditions">
+        <label for="elderDisease">Conditions</label>
+      </div>
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    const calcAge = dateStr => {
+      const birth = new Date(dateStr);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      return age;
+    };
+    flatpickr('#yourDob', { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', maxDate: 'today', onChange: (_, d) => document.getElementById('yourAge').value = calcAge(d) });
+    flatpickr('#elderDob', { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', maxDate: 'today', onChange: (_, d) => document.getElementById('elderAge').value = calcAge(d) });
+
+    function showView(data) {
+      document.getElementById('edit-section').classList.add('d-none');
+      document.getElementById('view-section').classList.remove('d-none');
+      Object.entries(data).forEach(([k,v]) => {
+        const el = document.getElementById('v-' + k);
+        if (el) el.textContent = v;
+      });
+    }
+    function showEdit() {
+      document.getElementById('view-section').classList.add('d-none');
+      document.getElementById('edit-section').classList.remove('d-none');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('/profile/me')
+        .then(r => r.json())
+        .then(data => {
+          if (Object.keys(data).length) {
+            Object.entries(data).forEach(([k,v]) => {
+              const inp = document.querySelector(`[name="${k}"]`);
+              if (inp) inp.value = v;
+            });
+            if (data.yourDob) document.getElementById('yourAge').value = calcAge(data.yourDob);
+            if (data.elderDob) document.getElementById('elderAge').value = calcAge(data.elderDob);
+            showView(data);
+          } else showEdit();
+        })
+        .catch(showEdit);
+
+      document.getElementById('edit-section').addEventListener('submit', e => {
+        e.preventDefault();
+        const payload = Object.fromEntries(new FormData(e.target).entries());
+        fetch('/profile/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+          .then(() => showView(payload))
+          .catch(() => alert('Save failed'));
+      });
+    });
+  </script>
+</body>
+</html>
