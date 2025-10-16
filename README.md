@@ -1,15 +1,8 @@
 # Wifi-Csi-by-raspi-4B
 ใช้ raspi 4B ที่ติดตั้ง firmware NEXMON ในการดักจับสัณญาณ wifi csi โดยนำมาใช้ในการจำแนกพฤติกรรมของมนุษย์โดยใช้โมเดล SVM และ LSTM ในการจำแนกพฤติกรรม
 
-# วิธีการเก็บ
-ลักษณะห้อง
-![room 1](images/7c41d2d2-e109-4858-8f1b-ce1b2507443d.png)
-![room 2](images/7c41d2d2-e109-4858-8f1b-ce1b2507443d.png)
-โดยข้อมูลจะเก็บทั้งหมด 900 file ในการทดสอบ โดยแต่ละไฟล์จะมี 300 packet ความเร็วในการยิง packet เท่ากับ 5000 um ซึ่งในการเก็บข้อมูลจะมีการกระจายตำแหน่งดังภาพ 
-
-# ความแม่นยำในการทำงาน
-
 # การแสดงผล csi แบบ real time
 
 # เว็บ - แอปพลิเคชั่น
 
+for mor detail https://drive.google.com/drive/folders/1FP7-zI_b0xvFNCW_srfofHUaVRmqUCcV?usp=sharing (isai nlp 2025) 
