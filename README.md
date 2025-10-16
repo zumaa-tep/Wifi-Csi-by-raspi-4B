@@ -1,8 +1,8 @@
-# Wifi-Csi-by-raspi-4B
-ใช้ raspi 4B ที่ติดตั้ง firmware NEXMON ในการดักจับสัณญาณ wifi csi โดยนำมาใช้ในการจำแนกพฤติกรรมของมนุษย์โดยใช้โมเดล SVM และ LSTM ในการจำแนกพฤติกรรม
+# Wifi-CSI-by-raspi-4B
+Using a Raspi 4B with NEXMON firmware installed, we capture Wi-Fi CSI signals and use them to classify human behavior using SVM and LSTM models.
 
-# การแสดงผล csi แบบ real time
+## Real-time CSI display
 
-# เว็บ - แอปพลิเคชั่น
+## Web - Application
 
-for mor detail https://drive.google.com/drive/folders/1FP7-zI_b0xvFNCW_srfofHUaVRmqUCcV?usp=sharing (isai nlp 2025) 
+For more details, visit https://drive.google.com/drive/folders/1FP7-zI_b0xvFNCW_srfofHUaVRmqUCcV?usp=sharing (isai nlp 2025)
